@@ -67,7 +67,7 @@ module.exports = {
 
         var layout = {
           autosize: false,
-          width: 500,
+          width: 1000,
           height: 500,
           margin: {
             l: 50,
@@ -78,31 +78,83 @@ module.exports = {
           },
           paper_bgcolor: "#7f7f7f",
           plot_bgcolor: "#c7c7c7",
+          shapes: [
+            {
+              type: "rect",
+              xref: "paper",
+              yref: "y",
+              x0: 0,
+              x1: 1,
+              y0: 500,
+              y1: 1199,
+              fillcolor: "#aaa",
+              opacity: 0.2,
+            },
+            {
+              type: "rect",
+              xref: "paper",
+              yref: "y",
+              x0: 0,
+              x1: 1,
+              y0: 1200,
+              y1: 1399,
+              fillcolor: "#0f0",
+              opacity: 0.2,
+            },
+            {
+              type: "rect",
+              xref: "paper",
+              yref: "y",
+              x0: 0,
+              x1: 1,
+              y0: 1400,
+              y1: 1599,
+              fillcolor: "#0ff",
+              opacity: 0.2,
+            },
+            {
+              type: "rect",
+              xref: "paper",
+              yref: "y",
+              x0: 0,
+              x1: 1,
+              y0: 1600,
+              y1: 1899,
+              fillcolor: "#00f",
+              opacity: 0.2,
+            },
+          ],
         };
 
-        var figure = { data: [trace1] };
+        var figure = { data: [trace1], layout: { layout } };
 
         var filename = args[0] + ".png";
 
-        plotly.getImage(figure, layout, function (error, imageStream) {
+        plotly.getImage(figure, { format: "png", width: 1500 }, function (
+          error,
+          imageStream
+        ) {
           if (error) return console.log(error);
-
+          // console.log(imageStream);
           var fileStream = fs.createWriteStream(`./images/${filename}`);
           imageStream.pipe(fileStream);
         });
 
-        setTimeout(() => {
-          var embeds = new Discord.MessageEmbed()
-            .setTitle(`Rating for ${args[0]}`)
-            .attachFiles([`./images/${filename}`])
-            .setImage(`attachment://${filename}`);
+        //UNCOMMENT BELOW FOR RATING GRAPH
 
-          message.reply(embeds);
-        }, 5000);
-
-        // plotly.plot(trace1, imgOpts, function (err, msg) {
+        // plotly.plot(trace1, { layout: layout }, function (err, msg) {
         //   if (err) console.log(err);
+        //   var img = `${msg.url}.png`;
         //   console.log(msg);
+        //   console.log(img);
+
+        //   setTimeout(() => {
+        //     var embeds = new Discord.MessageEmbed()
+        //       .setTitle(`Rating for ${args[0]}`)
+        //       .setImage(img);
+
+        //     message.reply(embeds);
+        //   }, 5000);
         // });
       });
   },
