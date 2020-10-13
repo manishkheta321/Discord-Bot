@@ -49,35 +49,27 @@ module.exports = {
         var trace1 = {
           x: timeSeries,
           y: rating,
-          mode: "lines",
+          mode: "lines+markers",
           type: "scatter",
           line: {
-            color: "#f00",
+            color: "yellow",
+            width: 1,
           },
+          name: `${args[0]}`,
         };
-
-        // var imgOpts = {
-        //   format: "png",
-        //   width: 1300,
-        //   height: 500,
-        //   paper_bgcolor: "rgba(0,0,0,1)",
-        //   plot_bgcolor: "rgba(255,0,0,1)",
-        //   showlegend: true,
-        // };
 
         var layout = {
           autosize: false,
-          width: 1000,
-          height: 500,
+          title: `Rating for ${args[0]}`,
           margin: {
             l: 50,
             r: 50,
-            b: 100,
-            t: 100,
+            b: 50,
+            t: 50,
             pad: 4,
           },
-          paper_bgcolor: "#7f7f7f",
-          plot_bgcolor: "#c7c7c7",
+          showlegend: true,
+
           shapes: [
             {
               type: "rect",
@@ -85,10 +77,14 @@ module.exports = {
               yref: "y",
               x0: 0,
               x1: 1,
-              y0: 500,
-              y1: 1199,
+              y0: 1000,
+              y1: 1200,
               fillcolor: "#aaa",
-              opacity: 0.2,
+              opacity: 0.4,
+              layer: "below",
+              line: {
+                width: 0,
+              },
             },
             {
               type: "rect",
@@ -97,9 +93,13 @@ module.exports = {
               x0: 0,
               x1: 1,
               y0: 1200,
-              y1: 1399,
+              y1: 1400,
               fillcolor: "#0f0",
-              opacity: 0.2,
+              opacity: 0.4,
+              layer: "below",
+              line: {
+                width: 0,
+              },
             },
             {
               type: "rect",
@@ -108,9 +108,13 @@ module.exports = {
               x0: 0,
               x1: 1,
               y0: 1400,
-              y1: 1599,
+              y1: 1600,
               fillcolor: "#0ff",
-              opacity: 0.2,
+              opacity: 0.4,
+              layer: "below",
+              line: {
+                width: 0,
+              },
             },
             {
               type: "rect",
@@ -121,41 +125,125 @@ module.exports = {
               y0: 1600,
               y1: 1899,
               fillcolor: "#00f",
+              opacity: 0.4,
+              layer: "below",
+              line: {
+                width: 0,
+              },
+            },
+            {
+              type: "rect",
+              xref: "paper",
+              yref: "y",
+              x0: 0,
+              x1: 1,
+              y0: 1900,
+              y1: 2100,
+              fillcolor: "#f0f",
+              opacity: 0.4,
+              layer: "below",
+              line: {
+                width: 0,
+              },
+            },
+            {
+              type: "rect",
+              xref: "paper",
+              yref: "y",
+              x0: 0,
+              x1: 1,
+              y0: 2100,
+              y1: 2300,
+              fillcolor: "orange",
+              opacity: 0.4,
+              layer: "below",
+              line: {
+                width: 0,
+              },
+            },
+            {
+              type: "rect",
+              xref: "paper",
+              yref: "y",
+              x0: 0,
+              x1: 1,
+              y0: 2300,
+              y1: 2400,
+              fillcolor: "orange",
+              opacity: 0.6,
+              layer: "below",
+              line: {
+                width: 0,
+              },
+            },
+            {
+              type: "rect",
+              xref: "paper",
+              yref: "y",
+              x0: 0,
+              x1: 1,
+              y0: 2400,
+              y1: 2600,
+              fillcolor: "red",
               opacity: 0.2,
+              layer: "below",
+              line: {
+                width: 0,
+              },
+            },
+            {
+              type: "rect",
+              xref: "paper",
+              yref: "y",
+              x0: 0,
+              x1: 1,
+              y0: 2600,
+              y1: 3000,
+              fillcolor: "red",
+              opacity: 0.6,
+              layer: "below",
+              line: {
+                width: 0,
+              },
+            },
+            {
+              type: "rect",
+              xref: "paper",
+              yref: "y",
+              x0: 0,
+              x1: 1,
+              y0: 3000,
+              y1: 3500,
+              fillcolor: "rgb(128,0,0)",
+              opacity: 0.6,
+              layer: "below",
+              line: {
+                width: 0,
+              },
             },
           ],
         };
 
-        var figure = { data: [trace1], layout: { layout } };
+        var figure = { data: [trace1], layout: layout };
 
         var filename = args[0] + ".png";
 
-        plotly.getImage(figure, { format: "png", width: 1500 }, function (
-          error,
-          imageStream
-        ) {
+        var pngOptions = { format: "png", width: 1000, height: 500 };
+
+        plotly.getImage(figure, pngOptions, function (error, imageStream) {
           if (error) return console.log(error);
-          // console.log(imageStream);
+
           var fileStream = fs.createWriteStream(`./images/${filename}`);
           imageStream.pipe(fileStream);
         });
 
-        //UNCOMMENT BELOW FOR RATING GRAPH
-
-        // plotly.plot(trace1, { layout: layout }, function (err, msg) {
-        //   if (err) console.log(err);
-        //   var img = `${msg.url}.png`;
-        //   console.log(msg);
-        //   console.log(img);
-
-        //   setTimeout(() => {
-        //     var embeds = new Discord.MessageEmbed()
-        //       .setTitle(`Rating for ${args[0]}`)
-        //       .setImage(img);
-
-        //     message.reply(embeds);
-        //   }, 5000);
-        // });
+        setTimeout(() => {
+          var embeds = new Discord.MessageEmbed()
+            .setTitle(`Rating for ${args[0]}`)
+            .attachFiles([`./images/${filename}`])
+            .setImage(`attachment://${filename}`);
+          message.reply(embeds);
+        }, 5000);
       });
   },
 };
