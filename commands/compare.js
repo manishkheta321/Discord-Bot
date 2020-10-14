@@ -2,28 +2,30 @@ const { username, api_key } = require("../config.json");
 const fs = require("fs");
 const fetch = require("node-fetch");
 const Discord = require("discord.js");
+const { time } = require("console");
 
 var plotly = require("plotly")(username, api_key);
 
 module.exports = {
-  name: "plot",
+  name: "compare",
   cooldown: 5,
-  usage: "<codeforces-user-handle>",
+  usage: "<codeforces-user-handle 1> <codeforces-user-handle 2> ",
   args: true,
   description: "Plot graph",
   async execute(message, args) {
-    var handle = args[0];
-    var url = `https://codeforces.com/api/user.rating?handle=${handle}`;
+    var handle1 = args[0];
+    var handle2 = args[1];
+    var url1 = `https://codeforces.com/api/user.rating?handle=${handle1}`;
+    var url2 = `https://codeforces.com/api/user.rating?handle=${handle2}`;
     var submissions;
     var rating = [];
     var timeSeries = [];
 
-    var f = await fetch(url)
+    await fetch(url1)
       .then((response) => {
         return response.json();
       })
       .then((datas) => {
-        //console.log(data);
         if (datas.status !== "OK") {
           message.reply(
             `There was an error finding the given codeforces handle: ${args[0]} `
@@ -32,51 +34,64 @@ module.exports = {
         }
 
         submissions = datas.result;
-        // console.log(submissions);
-        // console.log(submissions.length);
-
-        var maxRating = -1;
-
-        var da = new Date();
-        for (i = 0; i <= submissions.length - 1; i++) {
+        var time = [];
+        var rate = [];
+        for (let i = 0; i <= submissions.length - 1; i++) {
           var date = new Date(submissions[i].ratingUpdateTimeSeconds * 1000);
 
-          rating.push(submissions[i].newRating);
+          time.push(date);
+          rate.push(submissions[i].newRating);
+        }
+        timeSeries.push(time);
+        rating.push(rate);
+      });
 
-          if (maxRating < submissions[i].newRating) {
-            maxRating = submissions[i].newRating;
-            da = date;
-          }
-          timeSeries.push(date);
+    await fetch(url2)
+      .then((response) => {
+        return response.json();
+      })
+      .then((datas) => {
+        if (datas.status !== "OK") {
+          message.reply(
+            `There was an error finding the given codeforces handle: ${args[1]} `
+          );
+          return;
         }
 
-        // console.log(rating);
-        // console.log(timeSeries);
+        submissions = datas.result;
+        let time = [];
+        var rate = [];
+        for (let i = 0; i <= submissions.length - 1; i++) {
+          var date = new Date(submissions[i].ratingUpdateTimeSeconds * 1000);
+          time.push(date);
+
+          rate.push(submissions[i].newRating);
+        }
+        timeSeries.push(time);
+        rating.push(rate);
 
         var trace1 = {
-          x: timeSeries,
-          y: rating,
+          x: timeSeries[0],
+          y: rating[0],
           mode: "lines+markers",
           type: "scatter",
           line: {
-            color: "yellow",
+            color: "#006400",
             width: 1,
           },
           name: `${args[0]}`,
         };
         var trace2 = {
-          x: [da],
-          y: [maxRating],
-          mode: "markers",
+          x: timeSeries[1],
+          y: rating[1],
+          mode: "lines+markers",
           type: "scatter",
-          marker: {
+          line: {
             color: "red",
-            opacity: 0.5,
-            size: 8,
+            width: 1,
           },
-          name: "max rating",
+          name: `${args[1]}`,
         };
-
         var ratings = [
           1000,
           1200,
@@ -88,7 +103,7 @@ module.exports = {
           2400,
           2600,
           3000,
-          3500,
+          4000,
         ];
         var opaci = [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.2, 0.6, 0.6];
         var color = [
@@ -103,6 +118,7 @@ module.exports = {
           "red",
           "rgb(128,0,0)",
         ];
+
         var shapes = [];
 
         var shape = {};
@@ -124,11 +140,11 @@ module.exports = {
           };
 
           shapes.push(shape);
-          if (maxRating < ratings[i + 1]) break;
         }
+
         var layout = {
           autosize: false,
-          title: `Rating for ${args[0]}`,
+          title: `Rating for ${args[0]} & ${args[1]}`,
           margin: {
             l: 50,
             r: 50,
@@ -139,11 +155,8 @@ module.exports = {
           showlegend: true,
           shapes: shapes,
         };
-        console.log(layout);
-
         var figure = { data: [trace1, trace2], layout: layout };
-        console.log(figure);
-        var filename = "plot.png";
+        var filename = "plot1.png";
 
         var pngOptions = { format: "png", width: 1000, height: 500 };
 
@@ -156,13 +169,11 @@ module.exports = {
 
         setTimeout(() => {
           var embeds = new Discord.MessageEmbed()
-            .setTitle(`Rating for ${args[0]}`)
+            .setTitle(`Rating for ${args[0]} & ${args[1]}`)
             .attachFiles([`./images/${filename}`])
             .setImage(`attachment://${filename}`);
           message.reply(embeds);
         }, 5000);
       });
-    console.log(f);
-    console.log(timeSeries);
   },
 };
