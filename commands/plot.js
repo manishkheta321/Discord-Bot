@@ -33,18 +33,26 @@ module.exports = {
 
         submissions = datas.result;
         // console.log(submissions);
-        console.log(submissions.length);
+        // console.log(submissions.length);
 
-        for (let i = 0; i <= submissions.length - 1; i++) {
+        var maxRating = -1;
+
+        var da = new Date();
+        for (i = 0; i <= submissions.length - 1; i++) {
           console.log(submissions[i]);
           var date = new Date(submissions[i].ratingUpdateTimeSeconds * 1000);
           console.log(date);
           rating.push(submissions[i].newRating);
+
+          if (maxRating < submissions[i].newRating) {
+            maxRating = submissions[i].newRating;
+            da = date;
+          }
           timeSeries.push(date);
         }
 
-        console.log(rating);
-        console.log(timeSeries);
+        // console.log(rating);
+        // console.log(timeSeries);
 
         var trace1 = {
           x: timeSeries,
@@ -57,7 +65,68 @@ module.exports = {
           },
           name: `${args[0]}`,
         };
+        var trace2 = {
+          x: [da],
+          y: [maxRating],
+          mode: "markers",
+          type: "scatter",
+          marker: {
+            color: "red",
+            opacity: 0.5,
+            size: 8,
+          },
+          name: "max rating",
+        };
 
+        var ratings = [
+          1000,
+          1200,
+          1400,
+          1600,
+          1900,
+          2100,
+          2300,
+          2400,
+          2600,
+          3000,
+          3500,
+        ];
+        var opaci = [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.2, 0.6, 0.6];
+        var color = [
+          "#aaa",
+          "#0f0",
+          "#0ff",
+          "#00f",
+          "#f0f",
+          "orange",
+          "orange",
+          "red",
+          "red",
+          "rgb(128,0,0)",
+        ];
+        var shapes = [];
+
+        var shape = {};
+        for (var i = 0; i < 10; i++) {
+          shape = {
+            type: "rect",
+            xref: "paper",
+            yref: "y",
+            x0: 0,
+            x1: 1,
+            y0: ratings[i],
+            y1: ratings[i + 1],
+            fillcolor: color[i],
+            opacity: opaci[i],
+            layer: "below",
+            line: {
+              width: 0,
+            },
+          };
+
+          shapes.push(shape);
+          if (maxRating < ratings[i + 1]) break;
+        }
         var layout = {
           autosize: false,
           title: `Rating for ${args[0]}`,
@@ -69,164 +138,13 @@ module.exports = {
             pad: 4,
           },
           showlegend: true,
-
-          shapes: [
-            {
-              type: "rect",
-              xref: "paper",
-              yref: "y",
-              x0: 0,
-              x1: 1,
-              y0: 1000,
-              y1: 1200,
-              fillcolor: "#aaa",
-              opacity: 0.4,
-              layer: "below",
-              line: {
-                width: 0,
-              },
-            },
-            {
-              type: "rect",
-              xref: "paper",
-              yref: "y",
-              x0: 0,
-              x1: 1,
-              y0: 1200,
-              y1: 1400,
-              fillcolor: "#0f0",
-              opacity: 0.4,
-              layer: "below",
-              line: {
-                width: 0,
-              },
-            },
-            {
-              type: "rect",
-              xref: "paper",
-              yref: "y",
-              x0: 0,
-              x1: 1,
-              y0: 1400,
-              y1: 1600,
-              fillcolor: "#0ff",
-              opacity: 0.4,
-              layer: "below",
-              line: {
-                width: 0,
-              },
-            },
-            {
-              type: "rect",
-              xref: "paper",
-              yref: "y",
-              x0: 0,
-              x1: 1,
-              y0: 1600,
-              y1: 1899,
-              fillcolor: "#00f",
-              opacity: 0.4,
-              layer: "below",
-              line: {
-                width: 0,
-              },
-            },
-            {
-              type: "rect",
-              xref: "paper",
-              yref: "y",
-              x0: 0,
-              x1: 1,
-              y0: 1900,
-              y1: 2100,
-              fillcolor: "#f0f",
-              opacity: 0.4,
-              layer: "below",
-              line: {
-                width: 0,
-              },
-            },
-            {
-              type: "rect",
-              xref: "paper",
-              yref: "y",
-              x0: 0,
-              x1: 1,
-              y0: 2100,
-              y1: 2300,
-              fillcolor: "orange",
-              opacity: 0.4,
-              layer: "below",
-              line: {
-                width: 0,
-              },
-            },
-            {
-              type: "rect",
-              xref: "paper",
-              yref: "y",
-              x0: 0,
-              x1: 1,
-              y0: 2300,
-              y1: 2400,
-              fillcolor: "orange",
-              opacity: 0.6,
-              layer: "below",
-              line: {
-                width: 0,
-              },
-            },
-            {
-              type: "rect",
-              xref: "paper",
-              yref: "y",
-              x0: 0,
-              x1: 1,
-              y0: 2400,
-              y1: 2600,
-              fillcolor: "red",
-              opacity: 0.2,
-              layer: "below",
-              line: {
-                width: 0,
-              },
-            },
-            {
-              type: "rect",
-              xref: "paper",
-              yref: "y",
-              x0: 0,
-              x1: 1,
-              y0: 2600,
-              y1: 3000,
-              fillcolor: "red",
-              opacity: 0.6,
-              layer: "below",
-              line: {
-                width: 0,
-              },
-            },
-            {
-              type: "rect",
-              xref: "paper",
-              yref: "y",
-              x0: 0,
-              x1: 1,
-              y0: 3000,
-              y1: 3500,
-              fillcolor: "rgb(128,0,0)",
-              opacity: 0.6,
-              layer: "below",
-              line: {
-                width: 0,
-              },
-            },
-          ],
+          shapes: shapes,
         };
+        console.log(layout);
 
-        var figure = { data: [trace1], layout: layout };
-
-        var filename = args[0] + ".png";
+        var figure = { data: [trace1, trace2], layout: layout };
+        console.log(figure);
+        var filename = "plot.png";
 
         var pngOptions = { format: "png", width: 1000, height: 500 };
 
