@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^12.3.1",
+    "fuse.js": "^3.6.1",
     "genius-lyrics-api": "^3.0.3",
     "node-fetch": "^2.6.1",
     "plotly": "^1.0.6"
